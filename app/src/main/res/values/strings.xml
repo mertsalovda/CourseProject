@@ -12,8 +12,8 @@
     <string name="login_register_success">Успешно!</string>
     <string name="logout">Логаут</string>
     <string name="login_error">Ошибка логина. Неверный логин или пароль.</string>
-    <string name="name">Имя</string>
     <string name="request_error">Ошибка запроса</string>
     <string name="registration_success">Регистрация прошла успешно</string>
     <string name="registration_error">Ошибка регистрации</string>
+    <string name="name">Имя</string>
 </resources>

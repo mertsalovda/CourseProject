@@ -12,8 +12,6 @@ public class User implements Serializable {
     @SerializedName("password")
     private String password;
 
-    private String photoUri;
-
     private boolean hasSuccessLogin;
 
     public User(String email, String name, String password) {
@@ -38,19 +36,19 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public String getPhotoUri() {
-        return photoUri;
-    }
-
-    public void setPhotoUri(String photoUri) {
-        this.photoUri = photoUri;
-    }
-
     public boolean hasSuccessLogin() {
         return hasSuccessLogin;
     }
 
     public void setHasSuccessLogin(boolean hasSuccessLogin) {
         this.hasSuccessLogin = hasSuccessLogin;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
