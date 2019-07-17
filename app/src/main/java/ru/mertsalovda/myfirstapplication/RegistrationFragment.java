@@ -49,14 +49,16 @@ public class RegistrationFragment extends Fragment {
                         etLogin.getText().toString(),
                         etName.getText().toString(),
                         etPassword.getText().toString());
+                // Запрос на регистрацияю
                 Request request = new Request.Builder()
                         .url(BuildConfig.SERVER_URL.concat("/registration"))
-                        .post(RequestBody.create(JSON, new Gson().toJson(user)))
+                        .post(RequestBody.create(JSON, new Gson().toJson(user))) // Тело запроса
                         .build();
-
+                // Добавляем клиент
                 OkHttpClient client = new OkHttpClient();
-
+                // Асинхронный запрос
                 client.newCall(request).enqueue(new Callback() {
+                    // Обрабатываем запрос в UI-потоке
                     Handler handler = new Handler(getActivity().getMainLooper());
 
                     @Override
