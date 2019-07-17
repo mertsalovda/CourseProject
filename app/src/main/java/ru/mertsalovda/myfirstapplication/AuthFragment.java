@@ -26,6 +26,7 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import ru.mertsalovda.myfirstapplication.model.User;
 
 public class AuthFragment extends Fragment {
 

@@ -14,17 +14,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-
 import java.io.IOException;
 
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import ru.mertsalovda.myfirstapplication.model.User;
 
 public class RegistrationFragment extends Fragment {
 
@@ -49,27 +45,13 @@ public class RegistrationFragment extends Fragment {
                         etLogin.getText().toString(),
                         etName.getText().toString(),
                         etPassword.getText().toString());
-                // Запрос на регистрацияю
-                Request request = new Request.Builder()
-                        .url(BuildConfig.SERVER_URL.concat("/registration"))
-                        .post(RequestBody.create(JSON, new Gson().toJson(user))) // Тело запроса
-                        .build();
-                // Добавляем клиент
-                OkHttpClient client = new OkHttpClient();
                 // Асинхронный запрос
-                client.newCall(request).enqueue(new Callback() {
+                ApiUtils.getApiService().registration(user).enqueue(new Callback<Void>() {
                     // Обрабатываем запрос в UI-потоке
                     Handler handler = new Handler(getActivity().getMainLooper());
 
                     @Override
-                    public void onFailure(Call call, IOException e) {
-                        handler.post(() -> {
-                            showMessage(R.string.request_error);
-                        });
-                    }
-
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
+                    public void onResponse(Call<Void> call, final Response<Void> response) {
                         handler.post(() -> {
                             if (response.isSuccessful()) {
                                 showMessage(R.string.registration_success);
@@ -80,8 +62,14 @@ public class RegistrationFragment extends Fragment {
                             }
                         });
                     }
-                });
 
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {
+                        handler.post(() -> {
+                            showMessage(R.string.request_error);
+                        });
+                    }
+                });
             }
         }
     };

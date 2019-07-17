@@ -8,6 +8,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import ru.mertsalovda.myfirstapplication.model.User;
+
 public class ProfileActivity extends AppCompatActivity {
     public static final String USER_KEY = "USER_KEY";
 

@@ -2,6 +2,8 @@ package ru.mertsalovda.myfirstapplication;
 
 import android.support.annotation.Nullable;
 
+import com.google.gson.Gson;
+
 import java.io.IOException;
 
 import okhttp3.Authenticator;
@@ -11,10 +13,16 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.Route;
 import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiUtils {
 
     private static OkHttpClient okHttpClient;
+    private static Retrofit retrofit;
+    private static Gson gson;
+    private static AcademyApi api;
+
 
     public static OkHttpClient getBasicAuthClietn(String email, String password, boolean newInstance){
         if (newInstance || okHttpClient == null){
@@ -32,5 +40,27 @@ public class ApiUtils {
             okHttpClient = builder.build();
         }
         return okHttpClient;
+    }
+
+    public static Retrofit getRetrofit(){
+        if (gson == null){
+            gson = new Gson();
+        }
+        if (retrofit == null){
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(BuildConfig.SERVER_URL)
+                    //need for interceptor
+                    .client(getBasicAuthClietn("", "", false))
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+        }
+        return retrofit;
+    }
+
+    public static AcademyApi getApiService(){
+        if (api==null){
+            api = getRetrofit().create(AcademyApi.class);
+        }
+        return api;
     }
 }

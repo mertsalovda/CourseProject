@@ -10,6 +10,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.mertsalovda.myfirstapplication.model.User;
+
 public class SharedPreferencesHelper {
     public static final String SHARED_PREF_NAME = "SHARED_PREF_NAME";
     public static final String USERS_KEY = "USERS_KEY";
