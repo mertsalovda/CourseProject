@@ -1,24 +1,33 @@
 package ru.mertsalovda.myfirstapplication;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 
 public class User implements Serializable {
-    private String login;
+    @SerializedName("email")
+    private String email;
+    @SerializedName("name")
+    private String name;
+    @SerializedName("password")
     private String password;
+
     private String photoUri;
+
     private boolean hasSuccessLogin;
 
-    public User(String login, String password) {
-        this.login = login;
+    public User(String email, String name, String password) {
+        this.email = email;
+        this.name = name;
         this.password = password;
     }
 
-    public String getLogin() {
-        return login;
+    public String getEmail() {
+        return email;
     }
 
-    public void setLogin(String login) {
-        this.login = login;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {

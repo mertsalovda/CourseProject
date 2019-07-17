@@ -55,7 +55,7 @@ public class AuthFragment extends Fragment {
             }
 
             for (User user : sharedPreferencesHelper.getUsers()) {
-                if (user.getLogin().equalsIgnoreCase(tvLogin.getText().toString())
+                if (user.getEmail().equalsIgnoreCase(tvLogin.getText().toString())
                         && user.getPassword().equals(etPassword.getText().toString())) {
                     break;
                 }

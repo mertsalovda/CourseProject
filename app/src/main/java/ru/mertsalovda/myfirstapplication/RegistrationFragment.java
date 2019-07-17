@@ -1,6 +1,7 @@
 package ru.mertsalovda.myfirstapplication;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
@@ -13,9 +14,24 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
 public class RegistrationFragment extends Fragment {
 
+    public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+
     private EditText etLogin;
+    private EditText etName;
     private EditText etPassword;
     private EditText etPasswordAgain;
     private Button btnRegistration;
@@ -29,17 +45,41 @@ public class RegistrationFragment extends Fragment {
         @Override
         public void onClick(View view) {
             if (isInputValid()) {
-                boolean isAdded = sharedPreferencesHelper.addUser(new User(
+                User user = new User(
                         etLogin.getText().toString(),
-                        etPassword.getText().toString()
-                ));
+                        etName.getText().toString(),
+                        etPassword.getText().toString());
+                Request request = new Request.Builder()
+                        .url(BuildConfig.SERVER_URL.concat("/registration"))
+                        .post(RequestBody.create(JSON, new Gson().toJson(user)))
+                        .build();
 
-                if (isAdded) {
-                    showMessage(R.string.login_register_success);
-                    getFragmentManager().popBackStack();
-                } else {
-                    showMessage(R.string.login_register_error);
-                }
+                OkHttpClient client = new OkHttpClient();
+
+                client.newCall(request).enqueue(new Callback() {
+                    Handler handler = new Handler(getActivity().getMainLooper());
+
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        handler.post(() -> {
+                            showMessage(R.string.request_error);
+                        });
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        handler.post(() -> {
+                            if (response.isSuccessful()) {
+                                showMessage(R.string.registration_success);
+                                getFragmentManager().popBackStack();
+                            } else {
+                                //TODO детальная обработка ошибок
+                                showMessage(R.string.registration_error);
+                            }
+                        });
+                    }
+                });
+
             }
         }
     };
@@ -52,6 +92,7 @@ public class RegistrationFragment extends Fragment {
         sharedPreferencesHelper = new SharedPreferencesHelper(getActivity());
 
         etLogin = view.findViewById(R.id.etLogin);
+        etName = view.findViewById(R.id.etName);
         etPassword = view.findViewById(R.id.etPassword);
         etPasswordAgain = view.findViewById(R.id.tvPasswordAgain);
         btnRegistration = view.findViewById(R.id.btnRegistration);
@@ -63,7 +104,7 @@ public class RegistrationFragment extends Fragment {
 
     private boolean isInputValid() {
         String email = etLogin.getText().toString();
-        if (isEmailValid(email) && isPasswordsValid()) {
+        if (isEmailValid(email) && isPasswordsValid() && isNameValid()) {
             return true;
         }
 
@@ -81,6 +122,11 @@ public class RegistrationFragment extends Fragment {
         return password.equals(passwordAgain)
                 && !TextUtils.isEmpty(password)
                 && !TextUtils.isEmpty(passwordAgain);
+    }
+
+    private boolean isNameValid() {
+        String name = etName.getText().toString();
+        return !name.isEmpty();
     }
 
     private void showMessage(@StringRes int string) {
