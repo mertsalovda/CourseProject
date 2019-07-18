@@ -17,9 +17,12 @@ public interface AcademyApi {
     @POST("registration")
     Call<Void> registration(@Body User user);
 
-    @Headers("content-type: application/json")
+//    @Headers("content-type: application/json")
+//    @GET("user")
+//    Call<User> login(@Header("Authorization") String authorization);
+
     @GET("user")
-    Call<User> login(@Header("Authorization") String authorization);
+    Call<User> login();
 
     @GET("albums")
     Call<Albums> getAlbums();

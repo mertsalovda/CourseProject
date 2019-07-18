@@ -48,9 +48,7 @@ public class AuthFragment extends Fragment {
             if (isEmailValid() && isPasswordValid()) {
                 String email = tvEmail.getText().toString();
                 String password = etPassword.getText().toString();
-                String auth = Credentials.basic(email, password);
-                // Асинхронный запрос
-                ApiUtils.getApiService().login(auth).enqueue(new Callback<User>() {
+                ApiUtils.getApiService(email, password, true).login().enqueue(new Callback<User>() {
                     Handler handler = new Handler(getActivity().getMainLooper());
 
                     @Override
@@ -60,7 +58,6 @@ public class AuthFragment extends Fragment {
                                 //TODO детальная обработка ошибок
                                 showMessage(R.string.login_error);
                             } else {
-                                Gson gson = new Gson();
                                 User user = response.body();
 
                                 Intent startProfileIntent =

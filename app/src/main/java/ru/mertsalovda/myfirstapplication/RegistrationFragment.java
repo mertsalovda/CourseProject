@@ -46,7 +46,7 @@ public class RegistrationFragment extends Fragment {
                         etName.getText().toString(),
                         etPassword.getText().toString());
                 // Асинхронный запрос
-                ApiUtils.getApiService().registration(user).enqueue(new Callback<Void>() {
+                ApiUtils.getApiService("", "", false).registration(user).enqueue(new Callback<Void>() {
                     // Обрабатываем запрос в UI-потоке
                     Handler handler = new Handler(getActivity().getMainLooper());
 
@@ -55,7 +55,9 @@ public class RegistrationFragment extends Fragment {
                         handler.post(() -> {
                             if (response.isSuccessful()) {
                                 showMessage(R.string.registration_success);
-                                getFragmentManager().popBackStack();
+                                if (getFragmentManager() != null) {
+                                    getFragmentManager().popBackStack();
+                                }
                             } else {
                                 //TODO детальная обработка ошибок
                                 showMessage(R.string.registration_error);
@@ -65,9 +67,7 @@ public class RegistrationFragment extends Fragment {
 
                     @Override
                     public void onFailure(Call<Void> call, Throwable t) {
-                        handler.post(() -> {
-                            showMessage(R.string.request_error);
-                        });
+                        handler.post(() -> showMessage(R.string.request_error));
                     }
                 });
             }

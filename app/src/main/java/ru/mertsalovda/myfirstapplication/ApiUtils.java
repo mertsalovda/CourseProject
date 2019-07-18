@@ -42,24 +42,24 @@ public class ApiUtils {
         return okHttpClient;
     }
 
-    public static Retrofit getRetrofit(){
+    public static Retrofit getRetrofit(String email, String password, boolean newInstance){
         if (gson == null){
             gson = new Gson();
         }
-        if (retrofit == null){
+        if (retrofit == null || newInstance){
             retrofit = new Retrofit.Builder()
                     .baseUrl(BuildConfig.SERVER_URL)
                     //need for interceptor
-                    .client(getBasicAuthClient("", "", false))
+                    .client(getBasicAuthClient(email, password, newInstance))
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }
         return retrofit;
     }
 
-    public static AcademyApi getApiService(){
-        if (api==null){
-            api = getRetrofit().create(AcademyApi.class);
+    public static AcademyApi getApiService(String email, String password, boolean newInstance){
+        if (api==null || newInstance){
+            api = getRetrofit(email, password, newInstance).create(AcademyApi.class);
         }
         return api;
     }
