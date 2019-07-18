@@ -3,6 +3,8 @@ package ru.mertsalovda.myfirstapplication;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
+import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import ru.mertsalovda.myfirstapplication.model.Album;
@@ -14,6 +16,10 @@ import ru.mertsalovda.myfirstapplication.model.User;
 public interface AcademyApi {
     @POST("registration")
     Call<Void> registration(@Body User user);
+
+    @Headers("content-type: application/json")
+    @GET("user")
+    Call<User> login(@Header("Authorization") String authorization);
 
     @GET("albums")
     Call<Albums> getAlbums();

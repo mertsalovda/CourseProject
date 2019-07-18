@@ -24,7 +24,7 @@ public class ApiUtils {
     private static AcademyApi api;
 
 
-    public static OkHttpClient getBasicAuthClietn(String email, String password, boolean newInstance){
+    public static OkHttpClient getBasicAuthClient(String email, String password, boolean newInstance){
         if (newInstance || okHttpClient == null){
             OkHttpClient.Builder builder = new OkHttpClient.Builder();
 
@@ -50,7 +50,7 @@ public class ApiUtils {
             retrofit = new Retrofit.Builder()
                     .baseUrl(BuildConfig.SERVER_URL)
                     //need for interceptor
-                    .client(getBasicAuthClietn("", "", false))
+                    .client(getBasicAuthClient("", "", false))
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }
