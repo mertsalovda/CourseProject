@@ -51,7 +51,7 @@ public class ApiUtils {
                     .baseUrl(BuildConfig.SERVER_URL)
                     //need for interceptor
                     .client(getBasicAuthClient(email, password, newInstance))
-                    .addConverterFactory(GsonConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create(gson))
                     .build();
         }
         return retrofit;

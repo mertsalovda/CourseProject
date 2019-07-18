@@ -34,7 +34,7 @@ public class SharedPreferencesHelper {
     public boolean addUser(User user) {
         List<User> users = getUsers();
         for (User u : users) {
-            if (u.getEmail().equalsIgnoreCase(user.getEmail())) {
+            if (u.getData().getEmail().equalsIgnoreCase(user.getData().getEmail())) {
                 return false;
             }
         }
@@ -46,7 +46,7 @@ public class SharedPreferencesHelper {
     public boolean saveOrOverrideUser(User user) {
         List<User> users = getUsers();
         for (User u : users) {
-            if (u.getEmail().equalsIgnoreCase(user.getEmail())) {
+            if (u.getData().getEmail().equalsIgnoreCase(user.getData().getEmail())) {
                 users.remove(u);
                 break;
             }
@@ -60,8 +60,8 @@ public class SharedPreferencesHelper {
         List<String> successLogins = new ArrayList<>();
         List<User> allUsers = getUsers();
         for (User user : allUsers) {
-            if (user.hasSuccessLogin()) {
-                successLogins.add(user.getEmail());
+            if (user.getData().hasSuccessLogin()) {
+                successLogins.add(user.getData().getEmail());
             }
         }
         return successLogins;
@@ -70,9 +70,9 @@ public class SharedPreferencesHelper {
     public User login(String login, String password) {
         List<User> users = getUsers();
         for (User u : users) {
-            if (login.equalsIgnoreCase(u.getEmail())
-                    && password.equals(u.getPassword())) {
-                u.setHasSuccessLogin(true);
+            if (login.equalsIgnoreCase(u.getData().getEmail())
+                    && password.equals(u.getData().getPassword())) {
+                u.getData().setHasSuccessLogin(true);
                 sharedPreferences.edit().putString(USERS_KEY, gson.toJson(users, USERS_TYPE)).apply();
                 return u;
             }

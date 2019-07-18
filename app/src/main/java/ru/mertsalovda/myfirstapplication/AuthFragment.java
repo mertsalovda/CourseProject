@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 import okhttp3.Credentials;
 import retrofit2.Call;
@@ -58,7 +59,7 @@ public class AuthFragment extends Fragment {
                                 //TODO детальная обработка ошибок
                                 showMessage(R.string.login_error);
                             } else {
-                                User user = response.body();
+                                User user = new User(response.body().getData());
 
                                 Intent startProfileIntent =
                                         new Intent(getActivity(), ProfileActivity.class);

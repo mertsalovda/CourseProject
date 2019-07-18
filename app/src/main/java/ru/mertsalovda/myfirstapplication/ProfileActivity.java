@@ -28,8 +28,8 @@ public class ProfileActivity extends AppCompatActivity {
 
         Bundle bundle = getIntent().getExtras();
         user = (User) bundle.get(USER_KEY);
-        tvLogin.setText(user.getEmail());
-        tvName.setText(user.getName());
+        tvLogin.setText(user.getData().getEmail());
+        tvName.setText(user.getData().getName());
 
     }
 

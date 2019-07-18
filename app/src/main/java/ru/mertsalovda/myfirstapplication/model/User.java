@@ -5,50 +5,78 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 
 public class User implements Serializable {
-    @SerializedName("email")
-    private String email;
-    @SerializedName("name")
-    private String name;
-    @SerializedName("password")
-    private String password;
 
-    private boolean hasSuccessLogin;
+    @SerializedName("data")
+    private DataBean data;
+
+    public DataBean getData() {
+        return data;
+    }
+
+    public void setData(DataBean data) {
+        this.data = data;
+    }
+
+    public User(DataBean data) {
+        this.data = data;
+    }
 
     public User(String email, String name, String password) {
-        this.email = email;
-        this.name = name;
-        this.password = password;
+        data.setEmail(email);
+        data.setName(name);
+        data.setPassword(password);
     }
 
-    public String getEmail() {
-        return email;
-    }
+    public static class DataBean implements Serializable {
+        @SerializedName("id")
+        private int id;
+        @SerializedName("name")
+        private String name;
+        @SerializedName("email")
+        private String email;
+        @SerializedName("password")
+        private String password;
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+        private boolean hasSuccessLogin;
 
-    public String getPassword() {
-        return password;
-    }
+        public int getId() {
+            return id;
+        }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+        public void setId(int id) {
+            this.id = id;
+        }
 
-    public boolean hasSuccessLogin() {
-        return hasSuccessLogin;
-    }
+        public String getName() {
+            return name;
+        }
 
-    public void setHasSuccessLogin(boolean hasSuccessLogin) {
-        this.hasSuccessLogin = hasSuccessLogin;
-    }
+        public void setName(String name) {
+            this.name = name;
+        }
 
-    public String getName() {
-        return name;
-    }
+        public String getEmail() {
+            return email;
+        }
 
-    public void setName(String name) {
-        this.name = name;
+        public void setEmail(String email) {
+            this.email = email;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+
+        public boolean hasSuccessLogin() {
+            return hasSuccessLogin;
+        }
+
+        public void setHasSuccessLogin(boolean hasSuccessLogin) {
+            this.hasSuccessLogin = hasSuccessLogin;
+        }
     }
 }

@@ -45,6 +45,7 @@ public class RegistrationFragment extends Fragment {
                         etLogin.getText().toString(),
                         etName.getText().toString(),
                         etPassword.getText().toString());
+
                 // Асинхронный запрос
                 ApiUtils.getApiService("", "", false).registration(user).enqueue(new Callback<Void>() {
                     // Обрабатываем запрос в UI-потоке
