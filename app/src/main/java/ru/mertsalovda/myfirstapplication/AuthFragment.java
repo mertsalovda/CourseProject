@@ -3,6 +3,7 @@ package ru.mertsalovda.myfirstapplication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
@@ -49,7 +50,9 @@ public class AuthFragment extends Fragment {
             if (isEmailValid() && isPasswordValid()) {
                 String email = tvEmail.getText().toString();
                 String password = etPassword.getText().toString();
-                ApiUtils.getApiService(email, password, true).login().enqueue(new Callback<User>() {
+                // Создаю новый instance ApiUtils при авторизации нового пользователя
+                ApiUtils.setEmailPassword(email, password, true);
+                ApiUtils.getApiService().login().enqueue(new Callback<User>() {
                     Handler handler = new Handler(getActivity().getMainLooper());
 
                     @Override
@@ -96,8 +99,11 @@ public class AuthFragment extends Fragment {
     private View.OnFocusChangeListener onLoginFocusChangeListener = new View.OnFocusChangeListener() {
         @Override
         public void onFocusChange(View view, boolean hasFocus) {
+            // Решение ошибки при запусен на Android 8
+            // Которая возникает, если попытаться отобразить список слишком рано.
+            Handler handler = new Handler(Looper.getMainLooper());
             if (hasFocus) {
-                tvEmail.showDropDown();
+                handler.post(() -> tvEmail.showDropDown());
             }
         }
     };
@@ -127,8 +133,14 @@ public class AuthFragment extends Fragment {
 
         btnEnter.setOnClickListener(onEnterClickListener);
         btnRegister.setOnClickListener(onRegisterClickListener);
-        tvEmail.setOnFocusChangeListener(onLoginFocusChangeListener);
+
 
         return v;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        tvEmail.setOnFocusChangeListener(onLoginFocusChangeListener);
     }
 }

@@ -12,10 +12,11 @@ import ru.mertsalovda.myfirstapplication.model.Albums;
 import ru.mertsalovda.myfirstapplication.model.Song;
 import ru.mertsalovda.myfirstapplication.model.Songs;
 import ru.mertsalovda.myfirstapplication.model.User;
+import ru.mertsalovda.myfirstapplication.model.UserRegistration;
 
 public interface AcademyApi {
     @POST("registration")
-    Call<Void> registration(@Body User user);
+    Call<Void> registration(@Body UserRegistration user);
 
 //    @Headers("content-type: application/json")
 //    @GET("user")

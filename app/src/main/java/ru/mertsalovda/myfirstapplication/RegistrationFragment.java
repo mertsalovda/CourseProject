@@ -21,6 +21,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import ru.mertsalovda.myfirstapplication.model.User;
+import ru.mertsalovda.myfirstapplication.model.UserRegistration;
 
 public class RegistrationFragment extends Fragment {
 
@@ -41,13 +42,16 @@ public class RegistrationFragment extends Fragment {
         @Override
         public void onClick(View view) {
             if (isInputValid()) {
-                User user = new User(
+                // UserRegistration для регистрации,
+                // т.к. модель запроса на регистрацию отличается от модели,
+                // получаемой при GET запросе User
+                UserRegistration user = new UserRegistration(
                         etLogin.getText().toString(),
                         etName.getText().toString(),
                         etPassword.getText().toString());
 
                 // Асинхронный запрос
-                ApiUtils.getApiService("", "", false).registration(user).enqueue(new Callback<Void>() {
+                ApiUtils.getApiService().registration(user).enqueue(new Callback<Void>() {
                     // Обрабатываем запрос в UI-потоке
                     Handler handler = new Handler(getActivity().getMainLooper());
 

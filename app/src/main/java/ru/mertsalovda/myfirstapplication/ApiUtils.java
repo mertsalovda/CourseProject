@@ -22,10 +22,13 @@ public class ApiUtils {
     private static Retrofit retrofit;
     private static Gson gson;
     private static AcademyApi api;
+    private static String mEmail = "";
+    private static String mPassword = "";
+    private static boolean mNewInstance = false;
 
 
-    public static OkHttpClient getBasicAuthClient(String email, String password, boolean newInstance){
-        if (newInstance || okHttpClient == null){
+    public static OkHttpClient getBasicAuthClient(String email, String password, boolean newInstance) {
+        if (newInstance || okHttpClient == null) {
             OkHttpClient.Builder builder = new OkHttpClient.Builder();
 
             builder.authenticator(new Authenticator() {
@@ -42,25 +45,32 @@ public class ApiUtils {
         return okHttpClient;
     }
 
-    public static Retrofit getRetrofit(String email, String password, boolean newInstance){
-        if (gson == null){
+    public static Retrofit getRetrofit() {
+        if (gson == null) {
             gson = new Gson();
         }
-        if (retrofit == null || newInstance){
+        if (retrofit == null || mNewInstance) {
             retrofit = new Retrofit.Builder()
                     .baseUrl(BuildConfig.SERVER_URL)
                     //need for interceptor
-                    .client(getBasicAuthClient(email, password, newInstance))
+                    .client(getBasicAuthClient(mEmail, mPassword, mNewInstance))
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .build();
+            mNewInstance = false;
         }
         return retrofit;
     }
 
-    public static AcademyApi getApiService(String email, String password, boolean newInstance){
-        if (api==null || newInstance){
-            api = getRetrofit(email, password, newInstance).create(AcademyApi.class);
+    public static AcademyApi getApiService() {
+        if (api == null || mNewInstance) {
+            api = getRetrofit().create(AcademyApi.class);
         }
         return api;
+    }
+
+    public static void setEmailPassword(String email, String password, boolean newInstance) {
+        mEmail = email;
+        mPassword = password;
+        mNewInstance = newInstance;
     }
 }

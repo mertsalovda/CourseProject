@@ -22,20 +22,24 @@ public class User implements Serializable {
     }
 
     public User(String email, String name, String password) {
-        data.setEmail(email);
-        data.setName(name);
-        data.setPassword(password);
+        data = new DataBean(email, name, password);
     }
 
     public static class DataBean implements Serializable {
         @SerializedName("id")
         private int id;
-        @SerializedName("name")
-        private String name;
         @SerializedName("email")
         private String email;
+        @SerializedName("name")
+        private String name;
         @SerializedName("password")
         private String password;
+
+        public DataBean(String email, String name, String password) {
+            this.email = email;
+            this.name = name;
+            this.password = password;
+        }
 
         private boolean hasSuccessLogin;
 
