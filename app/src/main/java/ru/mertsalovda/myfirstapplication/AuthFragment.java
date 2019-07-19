@@ -12,6 +12,7 @@ import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,6 +23,7 @@ import com.google.gson.JsonObject;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 
 import okhttp3.Credentials;
 import retrofit2.Call;
@@ -35,6 +37,8 @@ public class AuthFragment extends Fragment {
     private EditText etPassword;
     private Button btnEnter;
     private Button btnRegister;
+    private SharedPreferencesHelper sharedPreferencesHelper;
+    private ArrayAdapter<String> emailedUsersAdapter;
 
     public static AuthFragment newInstance() {
         Bundle args = new Bundle();
@@ -63,6 +67,9 @@ public class AuthFragment extends Fragment {
                                 showMessage(R.string.login_error);
                             } else {
                                 User user = new User(response.body().getData());
+
+                                sharedPreferencesHelper
+                                        .insertSuccessEmail(tvEmail.getText().toString());
 
                                 Intent startProfileIntent =
                                         new Intent(getActivity(), ProfileActivity.class);
@@ -101,9 +108,8 @@ public class AuthFragment extends Fragment {
         public void onFocusChange(View view, boolean hasFocus) {
             // Решение ошибки при запусен на Android 8
             // Которая возникает, если попытаться отобразить список слишком рано.
-            Handler handler = new Handler(Looper.getMainLooper());
             if (hasFocus) {
-                handler.post(() -> tvEmail.showDropDown());
+                new Handler().post(() -> tvEmail.showDropDown());
             }
         }
     };
@@ -126,6 +132,8 @@ public class AuthFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fr_auth, container, false);
 
+        sharedPreferencesHelper = new SharedPreferencesHelper(getActivity());
+
         tvEmail = v.findViewById(R.id.etLogin);
         etPassword = v.findViewById(R.id.etPassword);
         btnEnter = v.findViewById(R.id.buttonEnter);
@@ -133,14 +141,16 @@ public class AuthFragment extends Fragment {
 
         btnEnter.setOnClickListener(onEnterClickListener);
         btnRegister.setOnClickListener(onRegisterClickListener);
+        tvEmail.setOnFocusChangeListener(onLoginFocusChangeListener);
 
+        emailedUsersAdapter = new ArrayAdapter<>(
+                getActivity(),
+                android.R.layout.simple_dropdown_item_1line,
+                sharedPreferencesHelper.getSuccessEmails()
+        );
+        tvEmail.setAdapter(emailedUsersAdapter);
 
         return v;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        tvEmail.setOnFocusChangeListener(onLoginFocusChangeListener);
-    }
 }
