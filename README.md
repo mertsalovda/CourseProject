@@ -1,2 +1,2 @@
 # CourseProject
-Retrifit2, OkHttp3, Fragment, AutoCompleteTextView, SharedPreferences
+Retrofit2, OkHttp3, Fragment, AutoCompleteTextView, SharedPreferences
