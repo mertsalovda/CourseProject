@@ -14,13 +14,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.io.IOException;
-
 import okhttp3.MediaType;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import ru.mertsalovda.myfirstapplication.model.User;
 import ru.mertsalovda.myfirstapplication.model.UserRegistration;
 
 public class RegistrationFragment extends Fragment {
@@ -59,12 +56,13 @@ public class RegistrationFragment extends Fragment {
                     public void onResponse(Call<Void> call, final Response<Void> response) {
                         handler.post(() -> {
                             if (response.isSuccessful()) {
-                                showMessage(R.string.registration_success);
+                                responseCodeProcessor(response.code());
                                 if (getFragmentManager() != null) {
                                     getFragmentManager().popBackStack();
                                 }
                             } else {
                                 //TODO детальная обработка ошибок
+                                responseCodeProcessor(response.code());
                                 showMessage(R.string.registration_error);
                             }
                         });
@@ -122,6 +120,20 @@ public class RegistrationFragment extends Fragment {
     private boolean isNameValid() {
         String name = etName.getText().toString();
         return !name.isEmpty();
+    }
+
+    private void responseCodeProcessor(int code) {
+        switch (code) {
+            case 204:
+                showMessage(R.string.auth_ok);
+                break;
+            case 400:
+                showMessage(R.string.dont_valid);
+                break;
+            case 500:
+                showMessage(R.string.server_error);
+                break;
+        }
     }
 
     private void showMessage(@StringRes int string) {

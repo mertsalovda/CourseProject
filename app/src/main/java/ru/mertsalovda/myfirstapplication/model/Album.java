@@ -24,7 +24,7 @@ public class Album {
         @SerializedName("release_date")
         private String releaseDate;
         @SerializedName("songs")
-        private List<Song> songs;
+        private List<Song.DataBean> songs;
 
         public int getId() {
             return id;
@@ -50,13 +50,12 @@ public class Album {
             this.releaseDate = releaseDate;
         }
 
-        public List<Song> getSongs() {
+        public List<Song.DataBean> getSongs() {
             return songs;
         }
 
-        public void setSongs(List<Song> songs) {
+        public void setSongs(List<Song.DataBean> songs) {
             this.songs = songs;
         }
-
     }
 }

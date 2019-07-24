@@ -3,11 +3,11 @@ package ru.mertsalovda.myfirstapplication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,17 +18,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-
-import okhttp3.Credentials;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import ru.mertsalovda.myfirstapplication.albums.AlbumsActivity;
 import ru.mertsalovda.myfirstapplication.model.User;
 
 public class AuthFragment extends Fragment {
@@ -51,7 +44,7 @@ public class AuthFragment extends Fragment {
     private View.OnClickListener onEnterClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            if (isEmailValid() && isPasswordValid()) {
+            if (isEmailPasswordValid()) {
                 String email = tvEmail.getText().toString();
                 String password = etPassword.getText().toString();
                 // Создаю новый instance ApiUtils при авторизации нового пользователя
@@ -62,19 +55,22 @@ public class AuthFragment extends Fragment {
                     @Override
                     public void onResponse(Call<User> call, Response<User> response) {
                         handler.post(() -> {
+                            Log.d("TAG", "code " + response.code());
                             if (!response.isSuccessful()) {
                                 //TODO детальная обработка ошибок
-                                showMessage(R.string.login_error);
+                                responseCodeProcessor(response.code());
+//                                showMessage(R.string.login_error);
                             } else {
                                 User user = new User(response.body().getData());
 
                                 sharedPreferencesHelper
                                         .insertSuccessEmail(tvEmail.getText().toString());
 
-                                Intent startProfileIntent =
-                                        new Intent(getActivity(), ProfileActivity.class);
-                                startProfileIntent.putExtra(ProfileActivity.USER_KEY, user);
-                                startActivity(startProfileIntent);
+//                                Intent startProfileIntent =
+//                                        new Intent(getActivity(), ProfileActivity.class);
+//                                startProfileIntent.putExtra(ProfileActivity.USER_KEY, user);
+//                                startActivity(startProfileIntent);
+                                startActivity(new Intent(getActivity(), AlbumsActivity.class));
                                 getActivity().finish();
                             }
                         });
@@ -91,6 +87,17 @@ public class AuthFragment extends Fragment {
 
         }
     };
+
+    private void responseCodeProcessor(int code) {
+        switch (code) {
+            case 401:
+                showMessage(R.string.dont_auth);
+                break;
+            case 500:
+                showMessage(R.string.server_error);
+                break;
+        }
+    }
 
     private View.OnClickListener onRegisterClickListener = new View.OnClickListener() {
         @Override
@@ -123,13 +130,24 @@ public class AuthFragment extends Fragment {
         return !TextUtils.isEmpty(etPassword.getText());
     }
 
+    private boolean isEmailPasswordValid() {
+        if (!isEmailValid()) {
+            tvEmail.setError("Неверный Email");
+        }
+        if (!isPasswordValid()) {
+            etPassword.setError("Введите пароль");
+        }
+        return isEmailValid() && isPasswordValid();
+    }
+
     private void showMessage(@StringRes int string) {
         Toast.makeText(getActivity(), string, Toast.LENGTH_LONG).show();
     }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fr_auth, container, false);
 
         sharedPreferencesHelper = new SharedPreferencesHelper(getActivity());
