@@ -14,6 +14,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -48,31 +50,22 @@ public class RegistrationFragment extends Fragment {
                         etPassword.getText().toString());
 
                 // Асинхронный запрос
-                ApiUtils.getApiService().registration(user).enqueue(new Callback<Void>() {
-                    // Обрабатываем запрос в UI-потоке
-                    Handler handler = new Handler(getActivity().getMainLooper());
-
-                    @Override
-                    public void onResponse(Call<Void> call, final Response<Void> response) {
-                        handler.post(() -> {
-                            if (response.isSuccessful()) {
-                                responseCodeProcessor(response.code());
-                                if (getFragmentManager() != null) {
-                                    getFragmentManager().popBackStack();
-                                }
-                            } else {
-                                //TODO детальная обработка ошибок
-                                responseCodeProcessor(response.code());
-                                showMessage(R.string.registration_error);
+                ApiUtils.getApiService()
+                        .registration(user)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(() -> {
+                            showMessage(R.string.registration_success);
+                            if (getFragmentManager() != null) {
+                                getFragmentManager().popBackStack();
                             }
+                        }
+                        , throwable -> {
+                            //TODO детальная обработка ошибок
+                            showMessage(R.string.registration_error);
                         });
-                    }
-
-                    @Override
-                    public void onFailure(Call<Void> call, Throwable t) {
-                        handler.post(() -> showMessage(R.string.request_error));
-                    }
-                });
+            } else {
+                showMessage(R.string.input_error);
             }
         }
     };

@@ -1,5 +1,6 @@
 package ru.mertsalovda.myfirstapplication;
 
+import io.reactivex.Completable;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -16,7 +17,7 @@ import ru.mertsalovda.myfirstapplication.model.UserRegistration;
 
 public interface AcademyApi {
     @POST("registration")
-    Call<Void> registration(@Body UserRegistration user);
+    Completable registration(@Body UserRegistration user);
 
 //    @Headers("content-type: application/json")
 //    @GET("user")

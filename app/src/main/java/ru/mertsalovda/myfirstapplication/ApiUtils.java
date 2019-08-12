@@ -14,6 +14,7 @@ import okhttp3.Response;
 import okhttp3.Route;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiUtils {
@@ -55,6 +56,7 @@ public class ApiUtils {
                     //need for interceptor
                     .client(getBasicAuthClient(mEmail, mPassword, mNewInstance))
                     .addConverterFactory(GsonConverterFactory.create(gson))
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                     .build();
             mNewInstance = false;
         }
