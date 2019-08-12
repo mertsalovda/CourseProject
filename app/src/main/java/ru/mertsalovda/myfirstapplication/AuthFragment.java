@@ -24,6 +24,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
+import retrofit2.HttpException;
 import retrofit2.Response;
 import ru.mertsalovda.myfirstapplication.albums.AlbumsActivity;
 import ru.mertsalovda.myfirstapplication.model.User;
@@ -64,7 +65,11 @@ public class AuthFragment extends Fragment {
                                     startActivity(new Intent(getActivity(), AlbumsActivity.class));
                                     getActivity().finish();
                                 }
-                                , throwable -> showMessage(R.string.login_error));
+                                , throwable -> {
+                                    if (throwable instanceof HttpException) {
+                                        responseCodeProcessor(((HttpException) throwable).code());
+                                    }
+                                });
             } else {
                 showMessage(R.string.input_error);
             }

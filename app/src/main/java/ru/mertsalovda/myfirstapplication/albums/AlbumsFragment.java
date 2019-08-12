@@ -1,5 +1,6 @@
 package ru.mertsalovda.myfirstapplication.albums;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -8,18 +9,18 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+import retrofit2.HttpException;
 import ru.mertsalovda.myfirstapplication.ApiUtils;
 import ru.mertsalovda.myfirstapplication.R;
 import ru.mertsalovda.myfirstapplication.album.DetailAlbumFragment;
-import ru.mertsalovda.myfirstapplication.model.Albums;
 
 public class AlbumsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
@@ -67,35 +68,31 @@ public class AlbumsFragment extends Fragment implements SwipeRefreshLayout.OnRef
     @Override
     public void onRefresh() {
         refresher.post(() -> {
-            refresher.setRefreshing(true);
             getAlbums();
         });
     }
 
+    @SuppressLint("CheckResult")
     private void getAlbums() {
 
-        ApiUtils.getApiService().getAlbums().enqueue(new Callback<Albums>() {
-            @Override
-            public void onResponse(Call<Albums> call, Response<Albums> response) {
-                if (response.isSuccessful()) {
+        ApiUtils.getApiService()
+                .getAlbums()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(disposable -> refresher.setRefreshing(true))
+                .doFinally(() -> refresher.setRefreshing(false))
+                .subscribe(albums -> {
                     errorView.setVisibility(View.GONE);
                     recyclerView.setVisibility(View.VISIBLE);
-                    albumAdapter.addData(response.body().getData(), true);
-                } else {
-                    errorView.setVisibility(View.VISIBLE);
-                    recyclerView.setVisibility(View.GONE);
-                }
-                refresher.setRefreshing(false);
-                errorRequestProcessor(response.code());
-            }
-
-            @Override
-            public void onFailure(Call<Albums> call, Throwable t) {
-                errorView.setVisibility(View.VISIBLE);
-                recyclerView.setVisibility(View.GONE);
-                refresher.setRefreshing(false);
-            }
-        });
+                    albumAdapter.addData(albums.getData(), true);
+                }, throwable -> {
+                    if (throwable instanceof HttpException) {
+                        int code = ((HttpException) throwable).code();
+                        errorRequestProcessor(code);
+                        errorView.setVisibility(View.VISIBLE);
+                        recyclerView.setVisibility(View.GONE);
+                    }
+                });
     }
 
     private void errorRequestProcessor(int code) {

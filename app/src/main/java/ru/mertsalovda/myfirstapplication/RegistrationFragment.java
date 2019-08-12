@@ -20,6 +20,7 @@ import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
 import retrofit2.Call;
 import retrofit2.Callback;
+import retrofit2.HttpException;
 import retrofit2.Response;
 import ru.mertsalovda.myfirstapplication.model.UserRegistration;
 
@@ -57,15 +58,16 @@ public class RegistrationFragment extends Fragment {
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(() -> {
-                            showMessage(R.string.registration_success);
-                            if (getFragmentManager() != null) {
-                                getFragmentManager().popBackStack();
-                            }
-                        }
-                        , throwable -> {
-                            //TODO детальная обработка ошибок
-                            showMessage(R.string.registration_error);
-                        });
+                                    showMessage(R.string.registration_success);
+                                    if (getFragmentManager() != null) {
+                                        getFragmentManager().popBackStack();
+                                    }
+                                }
+                                , throwable -> {
+                                    if (throwable instanceof HttpException) {
+                                        responseCodeProcessor(((HttpException) throwable).code());
+                                    }
+                                });
             } else {
                 showMessage(R.string.input_error);
             }

@@ -1,5 +1,6 @@
 package ru.mertsalovda.myfirstapplication.album;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,8 +15,11 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
+import retrofit2.HttpException;
 import retrofit2.Response;
 import ru.mertsalovda.myfirstapplication.ApiUtils;
 import ru.mertsalovda.myfirstapplication.R;
@@ -74,35 +78,31 @@ public class DetailAlbumFragment extends Fragment implements SwipeRefreshLayout.
     @Override
     public void onRefresh() {
         refresher.post(() -> {
-            refresher.setRefreshing(true);
             getAlbum();
         });
     }
 
+    @SuppressLint("CheckResult")
     private void getAlbum() {
 
-        ApiUtils.getApiService().getAlbum(album.getId()).enqueue(new Callback<Album>() {
-            @Override
-            public void onResponse(Call<Album> call, Response<Album> response) {
-                if (response.isSuccessful()) {
-                    errorView.setVisibility(View.GONE);
-                    recyclerView.setVisibility(View.VISIBLE);
-                    songsAdapter.addData(response.body().getData().getSongs(), true);
-                } else {
-                    errorView.setVisibility(View.VISIBLE);
-                    recyclerView.setVisibility(View.GONE);
-                    responseCodeProcessor(response.code());
-                }
-                refresher.setRefreshing(false);
-            }
-
-            @Override
-            public void onFailure(Call<Album> call, Throwable t) {
-                errorView.setVisibility(View.VISIBLE);
-                recyclerView.setVisibility(View.GONE);
-                refresher.setRefreshing(false);
-            }
-        });
+        ApiUtils.getApiService()
+                .getAlbum(album.getId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(disposable -> refresher.setRefreshing(true))
+                .doFinally(() -> refresher.setRefreshing(false))
+                .subscribe(album -> {
+                            errorView.setVisibility(View.GONE);
+                            recyclerView.setVisibility(View.VISIBLE);
+                            songsAdapter.addData(album.getData().getSongs(), true);
+                        }
+                        , throwable -> {
+                            if (throwable instanceof HttpException) {
+                                responseCodeProcessor(((HttpException) throwable).code());
+                                errorView.setVisibility(View.VISIBLE);
+                                recyclerView.setVisibility(View.GONE);
+                            }
+                        });
     }
 
     private void responseCodeProcessor(int code) {
