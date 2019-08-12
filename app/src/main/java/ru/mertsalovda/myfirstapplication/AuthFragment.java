@@ -1,5 +1,6 @@
 package ru.mertsalovda.myfirstapplication;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,6 +19,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -42,6 +46,7 @@ public class AuthFragment extends Fragment {
     }
 
     private View.OnClickListener onEnterClickListener = new View.OnClickListener() {
+        @SuppressLint("CheckResult")
         @Override
         public void onClick(View view) {
             if (isEmailPasswordValid()) {
@@ -49,38 +54,17 @@ public class AuthFragment extends Fragment {
                 String password = etPassword.getText().toString();
                 // Создаю новый instance ApiUtils при авторизации нового пользователя
                 ApiUtils.setEmailPassword(email, password, true);
-                ApiUtils.getApiService().login().enqueue(new Callback<User>() {
-                    Handler handler = new Handler(getActivity().getMainLooper());
-
-                    @Override
-                    public void onResponse(Call<User> call, Response<User> response) {
-                        handler.post(() -> {
-                            Log.d("TAG", "code " + response.code());
-                            if (!response.isSuccessful()) {
-                                //TODO детальная обработка ошибок
-                                responseCodeProcessor(response.code());
-//                                showMessage(R.string.login_error);
-                            } else {
-                                User user = new User(response.body().getData());
-
-                                sharedPreferencesHelper
-                                        .insertSuccessEmail(tvEmail.getText().toString());
-
-//                                Intent startProfileIntent =
-//                                        new Intent(getActivity(), ProfileActivity.class);
-//                                startProfileIntent.putExtra(ProfileActivity.USER_KEY, user);
-//                                startActivity(startProfileIntent);
-                                startActivity(new Intent(getActivity(), AlbumsActivity.class));
-                                getActivity().finish();
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onFailure(Call<User> call, Throwable t) {
-                        handler.post(() -> showMessage(R.string.request_error));
-                    }
-                });
+                ApiUtils.getApiService()
+                        .login()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(user -> {
+                                    sharedPreferencesHelper
+                                            .insertSuccessEmail(tvEmail.getText().toString());
+                                    startActivity(new Intent(getActivity(), AlbumsActivity.class));
+                                    getActivity().finish();
+                                }
+                                , throwable -> showMessage(R.string.login_error));
             } else {
                 showMessage(R.string.input_error);
             }

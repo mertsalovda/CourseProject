@@ -1,5 +1,6 @@
 package ru.mertsalovda.myfirstapplication;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -38,6 +39,7 @@ public class RegistrationFragment extends Fragment {
     }
 
     private View.OnClickListener onRegistrationClickListener = new View.OnClickListener() {
+        @SuppressLint("CheckResult")
         @Override
         public void onClick(View view) {
             if (isInputValid()) {
