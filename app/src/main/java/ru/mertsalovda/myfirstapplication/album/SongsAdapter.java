@@ -1,5 +1,6 @@
 package ru.mertsalovda.myfirstapplication.album;
 
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -7,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import ru.mertsalovda.myfirstapplication.R;
@@ -39,7 +41,6 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsHolder> {
         if (isRefreshed) {
             songs.clear();
         }
-
         songs.addAll(data);
         notifyDataSetChanged();
     }
