@@ -14,6 +14,7 @@ import ru.mertsalovda.myfirstapplication.model.Song;
 @Dao
 public interface MusicDao {
 
+    //albums
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAlbums(List<Album> albums);
 
@@ -28,12 +29,16 @@ public interface MusicDao {
     @Query("DELETE FROM album where id = :albumId")
     void deleteAlbumById(int albumId);
 
+    @Query("SELECT * FROM album where id = :albumId")
+    Album getAlbumById(int albumId);
 
+
+    //song
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertSongs(List<Song> songs);
 
-    @Query("SELECT * from song")
-    List<Song> getSongs();
+    @Query("SELECT * from song where album_id = :albumId")
+    List<Song> getSongsByAlbumId(int albumId);
 
 
 }

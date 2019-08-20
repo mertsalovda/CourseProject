@@ -15,6 +15,8 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 
+import java.util.Collections;
+
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.HttpException;
@@ -23,6 +25,7 @@ import ru.mertsalovda.myfirstapplication.App;
 import ru.mertsalovda.myfirstapplication.R;
 import ru.mertsalovda.myfirstapplication.db.MusicDao;
 import ru.mertsalovda.myfirstapplication.model.Album;
+import ru.mertsalovda.myfirstapplication.model.Song;
 
 public class DetailAlbumFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private static final String ALBUM_KEY = "ALBUM_KEY";
@@ -83,23 +86,32 @@ public class DetailAlbumFragment extends Fragment implements SwipeRefreshLayout.
     @SuppressLint("CheckResult")
     private void getAlbum() {
 
-        ApiUtils.getApiService()
-                .getSongs()
+        ApiUtils.getApiService().getAlbum(mAlbum.getId())
                 .subscribeOn(Schedulers.io())
-                .doOnSuccess(songs -> getMusicDao().insertSongs(songs))
+                .doOnSuccess(album -> {
+                    Collections.sort(album.getSongs());
+                    for (Song song : album.getSongs()) {
+                        song.setAlbumId(album.getId());
+                    }
+                    mAlbum = album;
+                    getMusicDao().insertSongs(album.getSongs());
+                })
                 .onErrorReturn(throwable -> {
                     if (ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass())) {
-                        return getMusicDao().getSongs();
+                        Album album = getMusicDao().getAlbumById(mAlbum.getId());
+                        album.setSongs(getMusicDao().getSongsByAlbumId(album.getId()));
+                        return album;
                     } else return null;
                 })
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(disposable -> refresher.setRefreshing(true))
                 .doFinally(() -> refresher.setRefreshing(false))
-                .subscribe(songs -> {
+                .subscribe(album -> {
                     errorView.setVisibility(View.GONE);
                     recyclerView.setVisibility(View.VISIBLE);
-                    songsAdapter.addData(songs, true);
+                    songsAdapter.addData(album.getSongs(), true);
                 }, throwable -> {
+                    throwable.getCause().printStackTrace();
                     if (throwable instanceof HttpException) {
                         responseCodeProcessor(((HttpException) throwable).code());
                         errorView.setVisibility(View.VISIBLE);
