@@ -2,7 +2,6 @@ package ru.mertsalovda.myfirstapplication;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
@@ -18,10 +17,8 @@ import android.widget.Toast;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
-import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.HttpException;
-import retrofit2.Response;
+import ru.mertsalovda.myfirstapplication.model.User;
 import ru.mertsalovda.myfirstapplication.model.UserRegistration;
 
 public class RegistrationFragment extends Fragment {

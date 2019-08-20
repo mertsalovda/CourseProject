@@ -19,15 +19,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.HttpException;
-import retrofit2.Response;
 import ru.mertsalovda.myfirstapplication.albums.AlbumsActivity;
-import ru.mertsalovda.myfirstapplication.model.User;
 
 public class AuthFragment extends Fragment {
 

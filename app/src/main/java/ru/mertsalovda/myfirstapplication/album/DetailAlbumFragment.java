@@ -19,7 +19,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.HttpException;
 import ru.mertsalovda.myfirstapplication.ApiUtils;
+import ru.mertsalovda.myfirstapplication.App;
 import ru.mertsalovda.myfirstapplication.R;
+import ru.mertsalovda.myfirstapplication.db.MusicDao;
 import ru.mertsalovda.myfirstapplication.model.Album;
 
 public class DetailAlbumFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
@@ -84,6 +86,12 @@ public class DetailAlbumFragment extends Fragment implements SwipeRefreshLayout.
         ApiUtils.getApiService()
                 .getSongs()
                 .subscribeOn(Schedulers.io())
+                .doOnSuccess(songs -> getMusicDao().insertSongs(songs))
+                .onErrorReturn(throwable -> {
+                    if (ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass())) {
+                        return getMusicDao().getSongs();
+                    } else return null;
+                })
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(disposable -> refresher.setRefreshing(true))
                 .doFinally(() -> refresher.setRefreshing(false))
@@ -115,4 +123,7 @@ public class DetailAlbumFragment extends Fragment implements SwipeRefreshLayout.
         Toast.makeText(getActivity(), string, Toast.LENGTH_LONG).show();
     }
 
+    private MusicDao getMusicDao() {
+        return ((App) getActivity().getApplication()).getDatabase().getMusicDao();
+    }
 }

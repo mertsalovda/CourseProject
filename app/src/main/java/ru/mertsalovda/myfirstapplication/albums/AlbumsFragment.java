@@ -93,7 +93,7 @@ public class AlbumsFragment extends Fragment implements SwipeRefreshLayout.OnRef
                     recyclerView.setVisibility(View.VISIBLE);
                     albumAdapter.addData(albums, true);
                 }, throwable -> {
-                    System.err.println("!!!!!!!!!!!!!!!!" + throwable.getMessage());
+                    throwable.getCause().printStackTrace();
                     if (throwable instanceof HttpException) {
                         throwable.getCause().printStackTrace();
                         errorRequestProcessor(((HttpException) throwable).code());

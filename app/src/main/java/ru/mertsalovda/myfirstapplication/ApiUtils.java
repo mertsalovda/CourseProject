@@ -68,8 +68,8 @@ public class ApiUtils {
                     .baseUrl(BuildConfig.SERVER_URL)
                     //need for interceptor
                     .client(getBasicAuthClient(mEmail, mPassword, mNewInstance))
-                    .addConverterFactory(GsonConverterFactory.create(gson))
                     .addConverterFactory(new DataConverterFactory())
+                    .addConverterFactory(GsonConverterFactory.create(gson))
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                     .build();
             mNewInstance = false;

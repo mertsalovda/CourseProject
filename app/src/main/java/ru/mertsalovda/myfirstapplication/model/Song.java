@@ -5,15 +5,18 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
+
 @Entity
 public class Song {
     @PrimaryKey
     @ColumnInfo(name = "id")
     @SerializedName("id")
     private int id;
+
     @ColumnInfo(name = "name")
     @SerializedName("name")
     private String name;
+
     @ColumnInfo(name = "duration")
     @SerializedName("duration")
     private String duration;

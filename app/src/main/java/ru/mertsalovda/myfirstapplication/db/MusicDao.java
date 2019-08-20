@@ -9,6 +9,7 @@ import android.arch.persistence.room.Query;
 import java.util.List;
 
 import ru.mertsalovda.myfirstapplication.model.Album;
+import ru.mertsalovda.myfirstapplication.model.Song;
 
 @Dao
 public interface MusicDao {
@@ -26,5 +27,13 @@ public interface MusicDao {
     //удалить альбом по id
     @Query("DELETE FROM album where id = :albumId")
     void deleteAlbumById(int albumId);
+
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertSongs(List<Song> songs);
+
+    @Query("SELECT * from song")
+    List<Song> getSongs();
+
 
 }
