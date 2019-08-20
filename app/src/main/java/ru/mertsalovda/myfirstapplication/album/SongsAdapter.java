@@ -15,7 +15,7 @@ import ru.mertsalovda.myfirstapplication.model.Song;
 public class SongsAdapter extends RecyclerView.Adapter<SongsHolder> {
 
     @NonNull
-    private final List<Song.DataBean> songs = new ArrayList<>();
+    private final List<Song> songs = new ArrayList<>();
 
     @Override
     public SongsHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -26,7 +26,7 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsHolder> {
 
     @Override
     public void onBindViewHolder(SongsHolder holder, int position) {
-        Song.DataBean song = songs.get(position);
+        Song song = songs.get(position);
         holder.bind(song);
     }
 
@@ -35,7 +35,7 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsHolder> {
         return songs.size();
     }
 
-    public void addData(List<Song.DataBean> data, boolean isRefreshed) {
+    public void addData(List<Song> data, boolean isRefreshed) {
         if (isRefreshed) {
             songs.clear();
         }

@@ -17,14 +17,10 @@ import android.widget.Toast;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.HttpException;
-import retrofit2.Response;
 import ru.mertsalovda.myfirstapplication.ApiUtils;
 import ru.mertsalovda.myfirstapplication.R;
 import ru.mertsalovda.myfirstapplication.model.Album;
-import ru.mertsalovda.myfirstapplication.model.Albums;
 
 public class DetailAlbumFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private static final String ALBUM_KEY = "ALBUM_KEY";
@@ -32,12 +28,12 @@ public class DetailAlbumFragment extends Fragment implements SwipeRefreshLayout.
     private RecyclerView recyclerView;
     private SwipeRefreshLayout refresher;
     private View errorView;
-    private Albums.DataBean album;
+    private Album mAlbum;
 
     @NonNull
     private final SongsAdapter songsAdapter = new SongsAdapter();
 
-    public static DetailAlbumFragment newInstance(Albums.DataBean album) {
+    public static DetailAlbumFragment newInstance(Album album) {
         Bundle args = new Bundle();
         args.putSerializable(ALBUM_KEY, album);
 
@@ -65,9 +61,9 @@ public class DetailAlbumFragment extends Fragment implements SwipeRefreshLayout.
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        album = (Albums.DataBean) getArguments().getSerializable(ALBUM_KEY);
+        mAlbum = (Album) getArguments().getSerializable(ALBUM_KEY);
 
-        getActivity().setTitle(album.getName());
+        getActivity().setTitle(mAlbum.getName());
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(songsAdapter);
@@ -86,7 +82,7 @@ public class DetailAlbumFragment extends Fragment implements SwipeRefreshLayout.
     private void getAlbum() {
 
         ApiUtils.getApiService()
-                .getAlbum(album.getId())
+                .getAlbum(mAlbum.getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(disposable -> refresher.setRefreshing(true))
@@ -94,7 +90,7 @@ public class DetailAlbumFragment extends Fragment implements SwipeRefreshLayout.
                 .subscribe(album -> {
                             errorView.setVisibility(View.GONE);
                             recyclerView.setVisibility(View.VISIBLE);
-                            songsAdapter.addData(album.getData().getSongs(), true);
+                            songsAdapter.addData(album.getSongs(), true);
                         }
                         , throwable -> {
                             if (throwable instanceof HttpException) {

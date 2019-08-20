@@ -10,12 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.mertsalovda.myfirstapplication.R;
-import ru.mertsalovda.myfirstapplication.model.Albums;
+import ru.mertsalovda.myfirstapplication.model.Album;
 
 public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsHolder> {
 
     @NonNull
-    private final List<Albums.DataBean> albums = new ArrayList<>();
+    private final List<Album> albums = new ArrayList<>();
     private final OnItemClickListener onClickListener;
 
     public AlbumsAdapter(OnItemClickListener onClickListener) {
@@ -31,7 +31,7 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsHolder> {
 
     @Override
     public void onBindViewHolder(AlbumsHolder holder, int position) {
-        Albums.DataBean album = albums.get(position);
+        Album album = albums.get(position);
         holder.bind(album, onClickListener);
     }
 
@@ -40,7 +40,7 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsHolder> {
         return albums.size();
     }
 
-    public void addData(List<Albums.DataBean> data, boolean isRefreshed) {
+    public void addData(List<Album> data, boolean isRefreshed) {
         if (isRefreshed) {
             albums.clear();
         }
@@ -50,6 +50,6 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsHolder> {
     }
 
     public interface OnItemClickListener {
-        void onItemClick(Albums.DataBean album);
+        void onItemClick(Album album);
     }
 }

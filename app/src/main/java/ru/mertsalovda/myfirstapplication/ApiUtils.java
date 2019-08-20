@@ -16,6 +16,7 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import ru.mertsalovda.myfirstapplication.model.converter.DataConverterFactory;
 
 public class ApiUtils {
 
@@ -56,6 +57,7 @@ public class ApiUtils {
                     //need for interceptor
                     .client(getBasicAuthClient(mEmail, mPassword, mNewInstance))
                     .addConverterFactory(GsonConverterFactory.create(gson))
+                    .addConverterFactory(new DataConverterFactory())
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                     .build();
             mNewInstance = false;

@@ -19,7 +19,7 @@ public class SongsHolder extends RecyclerView.ViewHolder {
         duration = itemView.findViewById(R.id.tv_duration);
     }
 
-    public void bind(Song.DataBean item) {
+    public void bind(Song item) {
         title.setText(item.getName());
         duration.setText(item.getDuration());
     }
