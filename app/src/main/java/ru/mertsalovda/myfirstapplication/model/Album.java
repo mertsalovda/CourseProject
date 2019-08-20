@@ -16,9 +16,11 @@ public class Album implements Serializable {
     @ColumnInfo(name = "id")
     @SerializedName("id")
     private int id;
+
     @ColumnInfo(name = "name")
     @SerializedName("name")
     private String name;
+
     @ColumnInfo(name = "release")
     @SerializedName("release_date")
     private String releaseDate;

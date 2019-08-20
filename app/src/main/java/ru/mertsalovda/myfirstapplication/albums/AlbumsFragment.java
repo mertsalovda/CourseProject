@@ -19,8 +19,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.HttpException;
 import ru.mertsalovda.myfirstapplication.ApiUtils;
+import ru.mertsalovda.myfirstapplication.App;
 import ru.mertsalovda.myfirstapplication.R;
 import ru.mertsalovda.myfirstapplication.album.DetailAlbumFragment;
+import ru.mertsalovda.myfirstapplication.db.MusicDao;
 
 public class AlbumsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
@@ -74,10 +76,15 @@ public class AlbumsFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     @SuppressLint("CheckResult")
     private void getAlbums() {
-
         ApiUtils.getApiService()
                 .getAlbums()
                 .subscribeOn(Schedulers.io())
+                .doOnSuccess(albums -> getMusicDao().insertAlbums(albums))
+                .onErrorReturn(throwable -> {
+                    if (ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass())) {
+                        return getMusicDao().getAlbums();
+                    } else return null;
+                })
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(disposable -> refresher.setRefreshing(true))
                 .doFinally(() -> refresher.setRefreshing(false))
@@ -86,9 +93,10 @@ public class AlbumsFragment extends Fragment implements SwipeRefreshLayout.OnRef
                     recyclerView.setVisibility(View.VISIBLE);
                     albumAdapter.addData(albums, true);
                 }, throwable -> {
+                    System.err.println("!!!!!!!!!!!!!!!!" + throwable.getMessage());
                     if (throwable instanceof HttpException) {
-                        int code = ((HttpException) throwable).code();
-                        errorRequestProcessor(code);
+                        throwable.getCause().printStackTrace();
+                        errorRequestProcessor(((HttpException) throwable).code());
                         errorView.setVisibility(View.VISIBLE);
                         recyclerView.setVisibility(View.GONE);
                     }
@@ -108,6 +116,10 @@ public class AlbumsFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     private void showMessage(@StringRes int string) {
         Toast.makeText(getActivity(), string, Toast.LENGTH_LONG).show();
+    }
+
+    private MusicDao getMusicDao() {
+        return ((App) getActivity().getApplication()).getDatabase().getMusicDao();
     }
 
 }

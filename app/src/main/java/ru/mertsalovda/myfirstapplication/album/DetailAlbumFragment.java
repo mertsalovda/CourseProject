@@ -82,23 +82,22 @@ public class DetailAlbumFragment extends Fragment implements SwipeRefreshLayout.
     private void getAlbum() {
 
         ApiUtils.getApiService()
-                .getAlbum(mAlbum.getId())
+                .getSongs()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(disposable -> refresher.setRefreshing(true))
                 .doFinally(() -> refresher.setRefreshing(false))
-                .subscribe(album -> {
-                            errorView.setVisibility(View.GONE);
-                            recyclerView.setVisibility(View.VISIBLE);
-                            songsAdapter.addData(album.getSongs(), true);
-                        }
-                        , throwable -> {
-                            if (throwable instanceof HttpException) {
-                                responseCodeProcessor(((HttpException) throwable).code());
-                                errorView.setVisibility(View.VISIBLE);
-                                recyclerView.setVisibility(View.GONE);
-                            }
-                        });
+                .subscribe(songs -> {
+                    errorView.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                    songsAdapter.addData(songs, true);
+                }, throwable -> {
+                    if (throwable instanceof HttpException) {
+                        responseCodeProcessor(((HttpException) throwable).code());
+                        errorView.setVisibility(View.VISIBLE);
+                        recyclerView.setVisibility(View.GONE);
+                    }
+                });
     }
 
     private void responseCodeProcessor(int code) {

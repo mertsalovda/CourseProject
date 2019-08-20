@@ -16,7 +16,7 @@
     <string name="registration_success">Регистрация прошла успешно</string>
     <string name="registration_error">Ошибка регистрации</string>
     <string name="name">Имя</string>
-    <string name="albums">albums</string>
+    <string name="albums">Альбомы</string>
     <string name="dont_auth">Не авторизован</string>
     <string name="server_error">Внутренняя ошибка сервера</string>
     <string name="auth_ok">Успешная регистрация</string>

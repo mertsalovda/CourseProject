@@ -5,6 +5,11 @@ import android.support.annotation.Nullable;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.List;
 
 import okhttp3.Authenticator;
 import okhttp3.Credentials;
@@ -19,6 +24,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import ru.mertsalovda.myfirstapplication.model.converter.DataConverterFactory;
 
 public class ApiUtils {
+
+    public static final List<Class<?>> NETWORK_EXCEPTIONS = Arrays.asList(
+            UnknownHostException.class,
+            SocketTimeoutException.class,
+            ConnectException.class
+    );
+
 
     private static OkHttpClient okHttpClient;
     private static Retrofit retrofit;
