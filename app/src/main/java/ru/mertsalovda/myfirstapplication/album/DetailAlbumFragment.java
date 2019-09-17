@@ -26,6 +26,7 @@ import retrofit2.HttpException;
 import ru.mertsalovda.myfirstapplication.ApiUtils;
 import ru.mertsalovda.myfirstapplication.App;
 import ru.mertsalovda.myfirstapplication.R;
+import ru.mertsalovda.myfirstapplication.comments.AlbumCommentsFragment;
 import ru.mertsalovda.myfirstapplication.db.MusicDao;
 import ru.mertsalovda.myfirstapplication.model.Album;
 import ru.mertsalovda.myfirstapplication.model.Song;
@@ -79,11 +80,15 @@ public class DetailAlbumFragment extends Fragment implements SwipeRefreshLayout.
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.go_to_comments:
-                Toast.makeText(getContext(), "GO TO COMMENTS", Toast.LENGTH_LONG).show();
+                getFragmentManager().beginTransaction()
+                        .replace(R.id.fragmentContainer, AlbumCommentsFragment.newInstance(mAlbum))
+                        .addToBackStack(AlbumCommentsFragment.class.getSimpleName())
+                        .commit();
                 break;
-                default: break;
+            default:
+                break;
         }
         return super.onOptionsItemSelected(item);
     }

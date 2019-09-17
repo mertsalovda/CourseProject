@@ -12,6 +12,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import java.util.Collections;
@@ -32,6 +34,8 @@ public class AlbumCommentsFragment extends Fragment implements SwipeRefreshLayou
     private RecyclerView recyclerView;
     private SwipeRefreshLayout refresher;
     private View errorView;
+    private ImageButton btnSend;
+    private EditText etCommetn;
     private Album mAlbum;
 
     @NonNull
@@ -59,6 +63,9 @@ public class AlbumCommentsFragment extends Fragment implements SwipeRefreshLayou
         refresher = view.findViewById(R.id.refresher);
         refresher.setOnRefreshListener(this);
         errorView = view.findViewById(R.id.errorView);
+
+        btnSend = view.findViewById(R.id.btn_send);
+        etCommetn = view.findViewById(R.id.et_message);
     }
 
     @Override
@@ -85,38 +92,23 @@ public class AlbumCommentsFragment extends Fragment implements SwipeRefreshLayou
     @SuppressLint("CheckResult")
     private void getComments() {
 
-//        ApiUtils.getApiService().getAlbum(mAlbum.getId())
-//                .subscribeOn(Schedulers.io())
-//                .doOnSuccess(album -> {
-//                    Collections.sort(album.getSongs());
-//                    for (Song song : album.getSongs()) {
-//                        song.setAlbumId(album.getId());
-//                    }
-//                    mAlbum = album;
-//                    getMusicDao().insertSongs(album.getSongs());
-//                })
-//                .onErrorReturn(throwable -> {
-//                    if (ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass())) {
-//                        Album album = getMusicDao().getAlbumById(mAlbum.getId());
-//                        album.setSongs(getMusicDao().getSongsByAlbumId(album.getId()));
-//                        return album;
-//                    } else return null;
-//                })
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .doOnSubscribe(disposable -> refresher.setRefreshing(true))
-//                .doFinally(() -> refresher.setRefreshing(false))
-//                .subscribe(album -> {
-//                    errorView.setVisibility(View.GONE);
-//                    recyclerView.setVisibility(View.VISIBLE);
-//                    commentsAdapter.addData(album.getSongs(), true);
-//                }, throwable -> {
-//                    throwable.getCause().printStackTrace();
-//                    if (throwable instanceof HttpException) {
-//                        responseCodeProcessor(((HttpException) throwable).code());
-//                        errorView.setVisibility(View.VISIBLE);
-//                        recyclerView.setVisibility(View.GONE);
-//                    }
-//                });
+        ApiUtils.getApiService().getComments(mAlbum.getId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(disposable -> refresher.setRefreshing(true))
+                .doFinally(() -> refresher.setRefreshing(false))
+                .subscribe(comments -> {
+                    errorView.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                    commentsAdapter.addData(comments, true);
+                }, throwable -> {
+                    throwable.getCause().printStackTrace();
+                    if (throwable instanceof HttpException) {
+                        responseCodeProcessor(((HttpException) throwable).code());
+                        errorView.setVisibility(View.VISIBLE);
+                        recyclerView.setVisibility(View.GONE);
+                    }
+                });
     }
 
     private void responseCodeProcessor(int code) {

@@ -1,12 +1,16 @@
 package ru.mertsalovda.myfirstapplication.comments;
 
+import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import ru.mertsalovda.myfirstapplication.R;
@@ -39,6 +43,18 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsHolder> {
     public void addData(List<Comment> data, boolean isRefreshed) {
         if (isRefreshed) {
             comments.clear();
+        }
+        for(Comment comment:data){
+            String oldDate = comment.getTimestamp();
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            Date date;
+            try {
+                date = dt.parse(oldDate);
+                @SuppressLint("SimpleDateFormat") SimpleDateFormat dt1 = new SimpleDateFormat("HH:mm:ss dd.MM.yyyy");
+                comment.setTimestamp(dt1.format(date));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         }
         comments.addAll(data);
         notifyDataSetChanged();
