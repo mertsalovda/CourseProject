@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/go_to_comments"
+        android:title="@string/comments"
+        android:icon="@drawable/outline_comment_black_24"
+        app:showAsAction="ifRoom"
+        />
+
+</menu>

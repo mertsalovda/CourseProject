@@ -6,4 +6,5 @@
     <color name="gradientStart">#FFB940</color>
     <color name="gradientEnd">#FF8C40</color>
     <color name="greenButton">#B2F105</color>
+    <color name="black">#000000</color>
 </resources>

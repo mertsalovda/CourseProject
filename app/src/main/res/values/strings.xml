@@ -21,4 +21,6 @@
     <string name="server_error">Внутренняя ошибка сервера</string>
     <string name="auth_ok">Успешная регистрация</string>
     <string name="dont_valid">Ошибка валидации</string>
+    <string name="enter_text">Введите текст</string>
+    <string name="comments">Коментарии</string>
 </resources>
