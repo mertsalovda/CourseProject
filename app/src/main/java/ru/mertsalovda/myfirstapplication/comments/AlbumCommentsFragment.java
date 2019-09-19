@@ -16,7 +16,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import java.util.Collections;
+import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -26,7 +26,7 @@ import ru.mertsalovda.myfirstapplication.App;
 import ru.mertsalovda.myfirstapplication.R;
 import ru.mertsalovda.myfirstapplication.db.MusicDao;
 import ru.mertsalovda.myfirstapplication.model.Album;
-import ru.mertsalovda.myfirstapplication.model.Song;
+import ru.mertsalovda.myfirstapplication.model.Comment;
 
 public class AlbumCommentsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private static final String ALBUM_KEY = "ALBUM_KEY";
@@ -34,6 +34,7 @@ public class AlbumCommentsFragment extends Fragment implements SwipeRefreshLayou
     private RecyclerView recyclerView;
     private SwipeRefreshLayout refresher;
     private View errorView;
+    private View emptyView;
     private ImageButton btnSend;
     private EditText etCommetn;
     private Album mAlbum;
@@ -63,6 +64,7 @@ public class AlbumCommentsFragment extends Fragment implements SwipeRefreshLayou
         refresher = view.findViewById(R.id.refresher);
         refresher.setOnRefreshListener(this);
         errorView = view.findViewById(R.id.errorView);
+        emptyView = view.findViewById(R.id.emptyView);
 
         btnSend = view.findViewById(R.id.btn_send);
         etCommetn = view.findViewById(R.id.et_message);
@@ -98,13 +100,29 @@ public class AlbumCommentsFragment extends Fragment implements SwipeRefreshLayou
                 .doOnSubscribe(disposable -> refresher.setRefreshing(true))
                 .doFinally(() -> refresher.setRefreshing(false))
                 .subscribe(comments -> {
-                    errorView.setVisibility(View.GONE);
-                    recyclerView.setVisibility(View.VISIBLE);
-                    commentsAdapter.addData(comments, true);
+                    if (comments.isEmpty()) {
+                        errorView.setVisibility(View.GONE);
+                        emptyView.setVisibility(View.VISIBLE);
+                        recyclerView.setVisibility(View.GONE);
+                    } else {
+                        errorView.setVisibility(View.GONE);
+                        emptyView.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                        if (comments.size() != recyclerView.getAdapter().getItemCount()) {
+                            commentsAdapter.addData(comments, true);
+                            if (recyclerView.getAdapter().getItemCount() == 0)
+                                showMessage(R.string.update_comments_list);
+                        } else {
+                            showMessage(R.string.no_new_comments);
+                        }
+                    }
                 }, throwable -> {
                     throwable.getCause().printStackTrace();
                     if (throwable instanceof HttpException) {
                         responseCodeProcessor(((HttpException) throwable).code());
+                        errorView.setVisibility(View.VISIBLE);
+                        recyclerView.setVisibility(View.GONE);
+                    } else {
                         errorView.setVisibility(View.VISIBLE);
                         recyclerView.setVisibility(View.GONE);
                     }

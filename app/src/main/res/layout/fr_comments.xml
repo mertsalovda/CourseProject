@@ -10,16 +10,25 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recycler"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
 
-            android:visibility="visible" />
+            <include
+                layout="@layout/error_view"
+                android:visibility="gone" />
 
-        <include
-            layout="@layout/error_view"
-            android:visibility="gone" />
+            <include
+                layout="@layout/empty_view"
+                android:visibility="gone" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="visible" />
+        </LinearLayout>
 
     </android.support.v4.widget.SwipeRefreshLayout>
 
@@ -39,8 +48,7 @@
             android:maxLines="5"
             android:scrollbars="vertical"
             android:imeOptions="actionSend"
-            android:inputType=
-                "textCapSentences|textAutoCorrect"/>
+            android:inputType="textCapSentences|textAutoCorrect"/>
         <ImageButton
             android:id="@+id/btn_send"
             android:layout_gravity="bottom"

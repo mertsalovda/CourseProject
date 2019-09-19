@@ -40,23 +40,34 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsHolder> {
         return comments.size();
     }
 
-    public void addData(List<Comment> data, boolean isRefreshed) {
+    public void addData(List<Comment> comments, boolean isRefreshed) {
         if (isRefreshed) {
-            comments.clear();
+            this.comments.clear();
         }
-        for(Comment comment:data){
-            String oldDate = comment.getTimestamp();
-            @SuppressLint("SimpleDateFormat") SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            Date date;
-            try {
-                date = dt.parse(oldDate);
-                @SuppressLint("SimpleDateFormat") SimpleDateFormat dt1 = new SimpleDateFormat("HH:mm:ss dd.MM.yyyy");
-                comment.setTimestamp(dt1.format(date));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+
+        for (Comment comment : comments) {
+            dateFormat(comment);
         }
-        comments.addAll(data);
+        this.comments.addAll(comments);
         notifyDataSetChanged();
+    }
+
+    private void dateFormat(Comment comment){
+        String oldDate = comment.getTimestamp();
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        Date date;
+        Date today = new Date();
+        SimpleDateFormat dt1;
+        try {
+            date = dt.parse(oldDate);
+            if (today.after(date)) {
+                dt1 = new SimpleDateFormat("dd.MM.yyyy");
+            } else {
+                dt1 = new SimpleDateFormat("HH:mm:ss");
+            }
+            comment.setTimestamp(dt1.format(date));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 }

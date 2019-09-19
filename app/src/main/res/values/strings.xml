@@ -23,4 +23,7 @@
     <string name="dont_valid">Ошибка валидации</string>
     <string name="enter_text">Введите текст</string>
     <string name="comments">Коментарии</string>
+    <string name="empty_comments_list">К этому альбому нет коментариев</string>
+    <string name="no_new_comments">“Новых комментариев нет”</string>
+    <string name="update_comments_list">“Комментарии обновлены”</string>
 </resources>
