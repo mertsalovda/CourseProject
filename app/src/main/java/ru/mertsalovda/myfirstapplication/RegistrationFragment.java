@@ -18,7 +18,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
 import retrofit2.HttpException;
-import ru.mertsalovda.myfirstapplication.model.User;
 import ru.mertsalovda.myfirstapplication.model.UserRegistration;
 
 public class RegistrationFragment extends Fragment {
@@ -125,7 +124,7 @@ public class RegistrationFragment extends Fragment {
                 showMessage(R.string.dont_valid);
                 break;
             case 500:
-                showMessage(R.string.server_error);
+                showMessage(R.string.response_500);
                 break;
         }
     }

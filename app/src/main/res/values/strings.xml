@@ -17,8 +17,6 @@
     <string name="registration_error">Ошибка регистрации</string>
     <string name="name">Имя</string>
     <string name="albums">Альбомы</string>
-    <string name="dont_auth">Не авторизован</string>
-    <string name="server_error">Внутренняя ошибка сервера</string>
     <string name="auth_ok">Успешная регистрация</string>
     <string name="dont_valid">Ошибка валидации</string>
     <string name="enter_text">Введите текст</string>
@@ -26,4 +24,9 @@
     <string name="empty_comments_list">К этому альбому нет коментариев</string>
     <string name="no_new_comments">“Новых комментариев нет”</string>
     <string name="update_comments_list">“Комментарии обновлены”</string>
+
+    <string name="response_201">Комментарий создан успешно</string>
+    <string name="response_401">Не авторизован</string>
+    <string name="response_404">Альбома не существует</string>
+    <string name="response_500">Внутренняя ошибка сервера</string>
 </resources>

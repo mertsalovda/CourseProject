@@ -1,4 +1,4 @@
-package ru.mertsalovda.myfirstapplication.model;
+package ru.mertsalovda.myfirstapplication.model.comment;
 
 import com.google.gson.annotations.SerializedName;
 

@@ -10,7 +10,8 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import ru.mertsalovda.myfirstapplication.model.Album;
-import ru.mertsalovda.myfirstapplication.model.Comment;
+import ru.mertsalovda.myfirstapplication.model.comment.Comment;
+import ru.mertsalovda.myfirstapplication.model.comment.CommentForSend;
 import ru.mertsalovda.myfirstapplication.model.Song;
 import ru.mertsalovda.myfirstapplication.model.User;
 import ru.mertsalovda.myfirstapplication.model.UserRegistration;
@@ -37,4 +38,9 @@ public interface AcademyApi {
     @GET("albums/{id}/comments")
     Single<List<Comment>> getComments(@Path("id")int id);
 
+    @POST("comments")
+    Single<Comment> sendComment(@Body CommentForSend comment);
+
+    @GET("comments/{id}")
+    Single<Comment> getCommentById(@Path("id") int id);
 }

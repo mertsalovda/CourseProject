@@ -2,6 +2,7 @@ package ru.mertsalovda.myfirstapplication.comments;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -9,13 +10,16 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -26,7 +30,8 @@ import ru.mertsalovda.myfirstapplication.App;
 import ru.mertsalovda.myfirstapplication.R;
 import ru.mertsalovda.myfirstapplication.db.MusicDao;
 import ru.mertsalovda.myfirstapplication.model.Album;
-import ru.mertsalovda.myfirstapplication.model.Comment;
+import ru.mertsalovda.myfirstapplication.model.comment.Comment;
+import ru.mertsalovda.myfirstapplication.model.comment.CommentForSend;
 
 public class AlbumCommentsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private static final String ALBUM_KEY = "ALBUM_KEY";
@@ -36,8 +41,10 @@ public class AlbumCommentsFragment extends Fragment implements SwipeRefreshLayou
     private View errorView;
     private View emptyView;
     private ImageButton btnSend;
-    private EditText etCommetn;
+    private EditText etComment;
     private Album mAlbum;
+
+    private boolean isFirstStart;
 
     @NonNull
     private final CommentsAdapter commentsAdapter = new CommentsAdapter();
@@ -67,7 +74,67 @@ public class AlbumCommentsFragment extends Fragment implements SwipeRefreshLayou
         emptyView = view.findViewById(R.id.emptyView);
 
         btnSend = view.findViewById(R.id.btn_send);
-        etCommetn = view.findViewById(R.id.et_message);
+        etComment = view.findViewById(R.id.et_message);
+
+        btnSend.setOnClickListener(v -> sendComment());
+
+        etComment.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEND) {
+                new Handler().post(() -> sendComment());
+                return true;
+            }
+            return false;
+        });
+
+        isFirstStart = true;
+    }
+
+    @SuppressLint("CheckResult")
+    private void sendComment() {
+        if (!TextUtils.isEmpty(etComment.getText())) {
+            CommentForSend comment = new CommentForSend();
+            comment.setText(etComment.getText().toString());
+            comment.setAlbumId(mAlbum.getId());
+            ApiUtils.getApiServiceNoData()
+                    .sendComment(comment)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnSubscribe(disposable -> refresher.setRefreshing(true))
+                    .doFinally(() -> refresher.setRefreshing(false))
+                    .subscribe((newComment) -> {
+                                getResponseComment(newComment.getId());
+                                showMessage(R.string.response_201);
+                            }
+                            , throwable -> {
+                                if (throwable instanceof HttpException) {
+                                    responseCodeProcessor(((HttpException) throwable).code());
+                                } else {
+                                    showMessage(R.string.request_error);
+                                }
+                            });
+        } else {
+            showMessage(R.string.enter_text);
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    private void getResponseComment(int id) {
+        ApiUtils.getApiService()
+                .getCommentById(id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(disposable -> refresher.setRefreshing(true))
+                .doFinally(() -> refresher.setRefreshing(false))
+                .subscribe(comment -> {
+                    List<Comment> list = new ArrayList<>();
+                    list.add(comment);
+                    commentsAdapter.addData(list, false);
+                    recyclerView.smoothScrollToPosition(commentsAdapter.getItemCount());
+                }, throwable -> {
+                    if (throwable instanceof HttpException) {
+                        responseCodeProcessor(((HttpException) throwable).code());
+                    }
+                });
     }
 
     @Override
@@ -94,9 +161,14 @@ public class AlbumCommentsFragment extends Fragment implements SwipeRefreshLayou
     @SuppressLint("CheckResult")
     private void getComments() {
 
-        ApiUtils.getApiService().getComments(mAlbum.getId())
+        ApiUtils.getApiService()
+                .getComments(mAlbum.getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(throwable -> {
+                    if (ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass())) {
+                    }
+                })
                 .doOnSubscribe(disposable -> refresher.setRefreshing(true))
                 .doFinally(() -> refresher.setRefreshing(false))
                 .subscribe(comments -> {
@@ -108,34 +180,43 @@ public class AlbumCommentsFragment extends Fragment implements SwipeRefreshLayou
                         errorView.setVisibility(View.GONE);
                         emptyView.setVisibility(View.GONE);
                         recyclerView.setVisibility(View.VISIBLE);
-                        if (comments.size() != recyclerView.getAdapter().getItemCount()) {
+                        if (comments.size() > recyclerView.getAdapter().getItemCount()) {
                             commentsAdapter.addData(comments, true);
-                            if (recyclerView.getAdapter().getItemCount() == 0)
+                            if (!isFirstStart)
                                 showMessage(R.string.update_comments_list);
                         } else {
                             showMessage(R.string.no_new_comments);
                         }
+                        recyclerView.scrollToPosition(commentsAdapter.getItemCount() - 1);
+                        isFirstStart = false;
                     }
                 }, throwable -> {
                     throwable.getCause().printStackTrace();
                     if (throwable instanceof HttpException) {
                         responseCodeProcessor(((HttpException) throwable).code());
-                        errorView.setVisibility(View.VISIBLE);
-                        recyclerView.setVisibility(View.GONE);
+                        showErrorLayout();
                     } else {
-                        errorView.setVisibility(View.VISIBLE);
-                        recyclerView.setVisibility(View.GONE);
+                        showErrorLayout();
                     }
                 });
+    }
+
+    private void showErrorLayout() {
+        errorView.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.GONE);
+        emptyView.setVisibility(View.GONE);
     }
 
     private void responseCodeProcessor(int code) {
         switch (code) {
             case 401:
-                showMessage(R.string.dont_auth);
+                showMessage(R.string.response_401);
+                break;
+            case 404:
+                showMessage(R.string.response_401);
                 break;
             case 500:
-                showMessage(R.string.server_error);
+                showMessage(R.string.response_500);
                 break;
         }
     }

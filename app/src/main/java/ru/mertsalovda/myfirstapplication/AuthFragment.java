@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -75,10 +74,10 @@ public class AuthFragment extends Fragment {
     private void responseCodeProcessor(int code) {
         switch (code) {
             case 401:
-                showMessage(R.string.dont_auth);
+                showMessage(R.string.response_401);
                 break;
             case 500:
-                showMessage(R.string.server_error);
+                showMessage(R.string.response_500);
                 break;
         }
     }

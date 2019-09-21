@@ -154,10 +154,10 @@ public class DetailAlbumFragment extends Fragment implements SwipeRefreshLayout.
     private void responseCodeProcessor(int code) {
         switch (code) {
             case 401:
-                showMessage(R.string.dont_auth);
+                showMessage(R.string.response_401);
                 break;
             case 500:
-                showMessage(R.string.server_error);
+                showMessage(R.string.response_500);
                 break;
         }
     }

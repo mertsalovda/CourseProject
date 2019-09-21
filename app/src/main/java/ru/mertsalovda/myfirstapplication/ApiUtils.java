@@ -34,8 +34,10 @@ public class ApiUtils {
 
     private static OkHttpClient okHttpClient;
     private static Retrofit retrofit;
+    private static Retrofit retrofit2;
     private static Gson gson;
     private static AcademyApi api;
+    private static AcademyApi apiNoData;
     private static String mEmail = "";
     private static String mPassword = "";
     private static boolean mNewInstance = false;
@@ -76,12 +78,37 @@ public class ApiUtils {
         }
         return retrofit;
     }
+    // Нужен для получения экземпляра Retrofit без DataConverterFactory
+    public static Retrofit getRetrofitNoData() {
+        if (gson == null) {
+            gson = new Gson();
+        }
+        if (retrofit2 == null || mNewInstance) {
+            retrofit2 = new Retrofit.Builder()
+                    .baseUrl(BuildConfig.SERVER_URL)
+                    //need for interceptor
+                    .client(getBasicAuthClient(mEmail, mPassword, mNewInstance))
+//                    .addConverterFactory(new DataConverterFactory())
+                    .addConverterFactory(GsonConverterFactory.create(gson))
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
+            mNewInstance = false;
+        }
+        return retrofit2;
+    }
 
     public static AcademyApi getApiService() {
         if (api == null || mNewInstance) {
             api = getRetrofit().create(AcademyApi.class);
         }
         return api;
+    }
+
+    public static AcademyApi getApiServiceNoData() {
+        if (apiNoData == null || mNewInstance) {
+            apiNoData = getRetrofitNoData().create(AcademyApi.class);
+        }
+        return apiNoData;
     }
 
     public static void setEmailPassword(String email, String password, boolean newInstance) {

@@ -9,7 +9,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -106,10 +105,10 @@ public class AlbumsFragment extends Fragment implements SwipeRefreshLayout.OnRef
     private void errorRequestProcessor(int code) {
         switch (code) {
             case 401:
-                showMessage(R.string.dont_auth);
+                showMessage(R.string.response_401);
                 break;
             case 500:
-                showMessage(R.string.server_error);
+                showMessage(R.string.response_500);
                 break;
         }
     }

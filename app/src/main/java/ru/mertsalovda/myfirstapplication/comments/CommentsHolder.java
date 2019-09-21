@@ -1,17 +1,11 @@
 package ru.mertsalovda.myfirstapplication.comments;
 
-import android.annotation.SuppressLint;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import ru.mertsalovda.myfirstapplication.R;
-import ru.mertsalovda.myfirstapplication.model.Comment;
-import ru.mertsalovda.myfirstapplication.model.Song;
+import ru.mertsalovda.myfirstapplication.model.comment.Comment;
 
 
 public class CommentsHolder extends RecyclerView.ViewHolder {

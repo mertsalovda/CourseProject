@@ -10,12 +10,12 @@ import android.view.ViewGroup;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import ru.mertsalovda.myfirstapplication.R;
-import ru.mertsalovda.myfirstapplication.model.Comment;
-import ru.mertsalovda.myfirstapplication.model.Song;
+import ru.mertsalovda.myfirstapplication.model.comment.Comment;
 
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsHolder> {
 
@@ -53,17 +53,24 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsHolder> {
     }
 
     private void dateFormat(Comment comment){
-        String oldDate = comment.getTimestamp();
+        String timestamp = comment.getTimestamp();
         @SuppressLint("SimpleDateFormat") SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         Date date;
         Date today = new Date();
         SimpleDateFormat dt1;
         try {
-            date = dt.parse(oldDate);
-            if (today.after(date)) {
-                dt1 = new SimpleDateFormat("dd.MM.yyyy");
+            date = dt.parse(timestamp);
+            Calendar calToday = Calendar.getInstance();
+            Calendar calDate = Calendar.getInstance();
+            calToday.setTime(today);
+            calDate.setTime(date);
+            boolean result = calToday.get(Calendar.YEAR) == calDate.get(Calendar.YEAR) &&
+                    calToday.get(Calendar.MONTH) == calDate.get(Calendar.MONTH) &&
+                    calToday.get(Calendar.DAY_OF_MONTH) == calDate.get(Calendar.DAY_OF_MONTH) ;
+            if (result) {
+                dt1 = new SimpleDateFormat("HH:mm");
             } else {
-                dt1 = new SimpleDateFormat("HH:mm:ss");
+                dt1 = new SimpleDateFormat("dd.MM.yyyy");
             }
             comment.setTimestamp(dt1.format(date));
         } catch (ParseException e) {
