@@ -162,6 +162,7 @@ public class AlbumCommentsFragment extends Fragment implements SwipeRefreshLayou
 
     @SuppressLint("CheckResult")
     private void getComments() {
+        hasNetwork = true;
 
         ApiUtils.getApiService()
                 .getComments(mAlbum.getId())
