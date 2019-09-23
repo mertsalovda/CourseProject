@@ -45,6 +45,7 @@ public class AlbumCommentsFragment extends Fragment implements SwipeRefreshLayou
     private Album mAlbum;
 
     private boolean isFirstStart;
+    private boolean hasNetwork = true;
 
     @NonNull
     private final CommentsAdapter commentsAdapter = new CommentsAdapter();
@@ -122,6 +123,7 @@ public class AlbumCommentsFragment extends Fragment implements SwipeRefreshLayou
         ApiUtils.getApiService()
                 .getCommentById(id)
                 .subscribeOn(Schedulers.io())
+                .doOnSuccess(comment -> getMusicDao().insertComment(comment))
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(disposable -> refresher.setRefreshing(true))
                 .doFinally(() -> refresher.setRefreshing(false))
@@ -164,11 +166,14 @@ public class AlbumCommentsFragment extends Fragment implements SwipeRefreshLayou
         ApiUtils.getApiService()
                 .getComments(mAlbum.getId())
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(throwable -> {
+                .doOnSuccess(comments -> getMusicDao().insertComments(comments))
+                .onErrorReturn(throwable -> {
                     if (ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass())) {
-                    }
+                        hasNetwork = false;
+                        return getMusicDao().getCommentByAlbumId(mAlbum.getId());
+                    } else return null;
                 })
+                .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(disposable -> refresher.setRefreshing(true))
                 .doFinally(() -> refresher.setRefreshing(false))
                 .subscribe(comments -> {
@@ -182,20 +187,21 @@ public class AlbumCommentsFragment extends Fragment implements SwipeRefreshLayou
                         recyclerView.setVisibility(View.VISIBLE);
                         if (comments.size() > recyclerView.getAdapter().getItemCount()) {
                             commentsAdapter.addData(comments, true);
-                            if (!isFirstStart)
+                            if (!isFirstStart) {
                                 showMessage(R.string.update_comments_list);
+                            }
                         } else {
                             showMessage(R.string.no_new_comments);
+                        }
+                        if (!hasNetwork) {
+                            showMessage(R.string.network_error);
                         }
                         recyclerView.scrollToPosition(commentsAdapter.getItemCount() - 1);
                         isFirstStart = false;
                     }
                 }, throwable -> {
-                    throwable.getCause().printStackTrace();
                     if (throwable instanceof HttpException) {
                         responseCodeProcessor(((HttpException) throwable).code());
-                        showErrorLayout();
-                    } else {
                         showErrorLayout();
                     }
                 });

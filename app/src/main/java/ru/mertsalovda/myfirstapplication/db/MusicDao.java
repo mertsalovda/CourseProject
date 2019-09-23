@@ -10,6 +10,7 @@ import java.util.List;
 
 import ru.mertsalovda.myfirstapplication.model.Album;
 import ru.mertsalovda.myfirstapplication.model.Song;
+import ru.mertsalovda.myfirstapplication.model.comment.Comment;
 
 @Dao
 public interface MusicDao {
@@ -40,5 +41,13 @@ public interface MusicDao {
     @Query("SELECT * from song where album_id = :albumId")
     List<Song> getSongsByAlbumId(int albumId);
 
+    // Comments
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertComments(List<Comment> comments);
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertComment(Comment comment);
+
+    @Query("SELECT * from comment where album_id = :albumId")
+    List<Comment> getCommentByAlbumId(int albumId);
 }

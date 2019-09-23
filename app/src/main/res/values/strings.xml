@@ -24,6 +24,7 @@
     <string name="empty_comments_list">К этому альбому нет коментариев</string>
     <string name="no_new_comments">“Новых комментариев нет”</string>
     <string name="update_comments_list">“Комментарии обновлены”</string>
+    <string name="network_error">Ошибка подключения</string>
 
     <string name="response_201">Комментарий создан успешно</string>
     <string name="response_401">Не авторизован</string>

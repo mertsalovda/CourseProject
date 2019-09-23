@@ -117,7 +117,8 @@ public class DetailAlbumFragment extends Fragment implements SwipeRefreshLayout.
     @SuppressLint("CheckResult")
     private void getAlbum() {
 
-        ApiUtils.getApiService().getAlbum(mAlbum.getId())
+        ApiUtils.getApiService()
+                .getAlbum(mAlbum.getId())
                 .subscribeOn(Schedulers.io())
                 .doOnSuccess(album -> {
                     Collections.sort(album.getSongs());
